@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const isFalsy = (value: unknown) => (value === 0 ? false : !value);
 
@@ -78,4 +78,27 @@ export const useArray = (persons: { name: string; age: number }[]) => {
     removeIndex,
     add,
   };
+};
+
+export const useDocumentTitle = (
+  title: string,
+  keepOnUnMount: boolean = true
+) => {
+  const oldTitle = useRef(document.title).current;
+
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
+  useEffect(() => {
+    return () => {
+      if (!keepOnUnMount) {
+        document.title = oldTitle;
+      }
+    };
+  }, [keepOnUnMount, oldTitle]);
+};
+
+export const resetRoute = () => {
+  window.location.href = window.location.origin;
 };

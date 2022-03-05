@@ -6,10 +6,12 @@ import styled from "@emotion/styled";
 import left from "assets/left.png";
 import right from "assets/right.png";
 import title from "assets/title.png";
+import { useDocumentTitle } from "utils";
 
 export const UnauthenticatedApp = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  useDocumentTitle("jira管理系统");
   return (
     <Container>
       <Header />
