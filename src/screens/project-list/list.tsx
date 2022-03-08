@@ -1,13 +1,15 @@
 import React from "react";
 import { User } from "./search-panel";
-import { Table, TableProps } from "antd";
+import { Button, Dropdown, Menu, Table, TableProps } from "antd";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
+import { Pin } from "components/pin";
+import { useEditProject } from "utils/project";
 
 export interface Project {
-  id: string;
+  id: number;
   name: string;
-  personId: string;
+  personId: number;
   pin: boolean;
   organization: string;
   created: number;
@@ -15,13 +17,34 @@ export interface Project {
 
 interface ListProps extends TableProps<Project> {
   users: User[];
+  refresh: () => void;
+  projectModalOpen: (isClose: boolean) => void;
 }
 
-export const List = ({ users, ...props }: ListProps) => {
+export const List = ({
+  users,
+  refresh,
+  projectModalOpen,
+  ...props
+}: ListProps) => {
+  const { mutate } = useEditProject();
+  const pinProject = (id: number) => (pin: boolean) =>
+    mutate({ id, pin }).then(() => refresh());
   return (
     <Table
       pagination={false}
       columns={[
+        {
+          title: <Pin checked={true} disabled={true} />,
+          render(value, project) {
+            return (
+              <Pin
+                checked={project.pin}
+                onCheckedChange={pinProject(project.id)}
+              ></Pin>
+            );
+          },
+        },
         {
           title: "名称",
           sorter: (a, b) => a.name.localeCompare(b.name),
@@ -53,6 +76,31 @@ export const List = ({ users, ...props }: ListProps) => {
                   ? dayjs(project.created).format("YYYY-MM-DD")
                   : "无"}
               </span>
+            );
+          },
+        },
+        {
+          render(value, project) {
+            return (
+              <Dropdown
+                overlay={
+                  <Menu>
+                    <Menu.Item key={"edit"}>
+                      <Button
+                        type="link"
+                        style={{ padding: 0 }}
+                        onClick={() => projectModalOpen}
+                      >
+                        编辑项目
+                      </Button>
+                    </Menu.Item>
+                  </Menu>
+                }
+              >
+                <Button style={{ padding: 0 }} type="link">
+                  ...
+                </Button>
+              </Dropdown>
             );
           },
         },

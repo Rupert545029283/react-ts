@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useUrlQueryParam } from "./url";
 
 export const isFalsy = (value: unknown) => (value === 0 ? false : !value);
 
@@ -101,4 +102,28 @@ export const useDocumentTitle = (
 
 export const resetRoute = () => {
   window.location.href = window.location.origin;
+};
+
+export const useProjectsSearchParams = () => {
+  const [param, setParam] = useUrlQueryParam(["name", "personId"]);
+
+  return [
+    useMemo(
+      () => ({ ...param, personId: Number(param.personId) || undefined }),
+      [param]
+    ),
+    setParam,
+  ] as const;
+};
+
+export const useMountedRef = () => {
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  return mountedRef;
 };
